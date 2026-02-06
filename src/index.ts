@@ -1,10 +1,12 @@
 class Node<T> {
   value: T;
   next: Node<T> | null;
+  prev: Node<T> | null; // Added for Doubly Linked List
 
-  constructor(value: T, next: Node<T> | null = null) {
+  constructor(value: T, next: Node<T> | null = null, prev: Node<T> | null = null) {
     this.value = value;
     this.next = next;
+    this.prev = prev; // Initialize prev
   }
 }
 
@@ -29,6 +31,7 @@ class LinkedList<T> {
       this.head = newNode;
       this.tail = newNode;
     } else {
+      newNode.prev = this.tail; // Set prev for new node
       this.tail!.next = newNode;
       this.tail = newNode;
     }
@@ -54,16 +57,19 @@ class LinkedList<T> {
     const newNode = new Node(value);
     if (index === 0) {
       newNode.next = this.head;
+      if (this.head) {
+        this.head.prev = newNode; // Set prev for old head
+      }
       this.head = newNode;
     } else {
       let current = this.head;
-      let prev: Node<T> | null = null;
       for (let i = 0; i < index; i++) {
-        prev = current;
         current = current!.next;
       }
+      newNode.prev = current!.prev;
       newNode.next = current;
-      prev!.next = newNode;
+      current!.prev!.next = newNode;
+      current!.prev = newNode;
     }
     this.size++;
     return true;
@@ -79,26 +85,22 @@ class LinkedList<T> {
       return false;
     }
 
-    if (this.head.value === value) {
-      this.head = this.head.next;
-      if (!this.head) {
-        this.tail = null;
-      }
-      this.size--;
-      return true;
-    }
-
     let current = this.head;
-    let prev: Node<T> | null = null;
     while (current && current.value !== value) {
-      prev = current;
       current = current.next;
     }
 
     if (current) {
-      prev!.next = current.next;
-      if (current === this.tail) {
-        this.tail = prev;
+      if (current.prev) {
+        current.prev.next = current.next;
+      } else {
+        this.head = current.next;
+      }
+
+      if (current.next) {
+        current.next.prev = current.prev;
+      } else {
+        this.tail = current.prev;
       }
       this.size--;
       return true;
@@ -117,25 +119,23 @@ class LinkedList<T> {
     }
 
     let removedValue: T | null = null;
+    let current = this.head;
 
-    if (index === 0) {
-      removedValue = this.head.value;
-      this.head = this.head.next;
-      if (!this.head) {
-        this.tail = null;
-      }
+    for (let i = 0; i < index; i++) {
+      current = current!.next;
+    }
+    removedValue = current!.value;
+
+    if (current!.prev) {
+      current!.prev.next = current!.next;
     } else {
-      let current = this.head;
-      let prev: Node<T> | null = null;
-      for (let i = 0; i < index; i++) {
-        prev = current;
-        current = current!.next;
-      }
-      removedValue = current!.value;
-      prev!.next = current!.next;
-      if (current === this.tail) {
-        this.tail = prev;
-      }
+      this.head = current!.next;
+    }
+
+    if (current!.next) {
+      current!.next.prev = current!.prev;
+    } else {
+      this.tail = current!.prev;
     }
     this.size--;
     return removedValue;
@@ -216,7 +216,7 @@ class LinkedList<T> {
 }
 
 // Example Usage:
-console.log('--- Integer Linked List ---');
+console.log('--- Integer Doubly Linked List ---');
 const numberList = new LinkedList<number>();
 numberList.add(10);
 numberList.add(20);
@@ -237,8 +237,7 @@ numberList.removeAt(0); // List: 15, 30
 console.log('List after removing at index 0:', numberList.toArray()); // [15, 30]
 console.log('Size:', numberList.size); // 2
 
-console.log('
---- String Linked List ---');
+console.log('\n--- String Doubly Linked List ---');
 const stringList = new LinkedList<string>();
 stringList.add('Apple');
 stringList.add('Banana');
