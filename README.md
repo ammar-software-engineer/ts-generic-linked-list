@@ -1,6 +1,6 @@
-# TS Generic Linked List
+# TS Generic Doubly Linked List
 
-A comprehensive and type-safe generic Doubly Linked List implementation in TypeScript. This data structure allows for efficient insertion and deletion of elements at various positions, making it suitable for scenarios where dynamic data ordering and manipulation are critical.
+A comprehensive and type-safe generic Doubly Linked List implementation in TypeScript. This data structure allows for efficient insertion and deletion of elements at various positions, making it suitable for scenarios where dynamic data ordering and manipulation are critical. Each node maintains references to both the next and previous nodes, enabling bidirectional traversal.
 
 ## Table of Contents
 
@@ -27,16 +27,17 @@ A comprehensive and type-safe generic Doubly Linked List implementation in TypeS
 ## Features
 
 - **Generic Type Support**: Works with any data type, ensuring type safety through TypeScript generics (`<T>`).
-- **Basic Operations**: Includes fundamental linked list operations like adding, inserting, removing, and finding elements.
+- **Doubly Linked Structure**: Each node has `next` and `prev` pointers for bidirectional traversal.
+- **Efficient Operations**: Includes fundamental linked list operations like adding, inserting, removing, and finding elements with improved efficiency for certain operations due to `prev` pointers.
 - **Index-based Operations**: Supports operations based on the index of elements.
-- **Traversal**: Provides a method to iterate through all elements.
+- **Traversal**: Provides a method to iterate through all elements (forward).
 - **Size Tracking**: Maintains an accurate count of elements in the list.
 - **Clear List Functionality**: Easily reset the list to an empty state.
 - **Head and Tail Pointers**: Efficiently manages the beginning and end of the list.
 
 ## Installation
 
-To use this generic linked list in your TypeScript project, you can integrate the `Node` and `LinkedList` classes directly.
+To use this generic doubly linked list in your TypeScript project, you can integrate the `Node` and `LinkedList` classes directly.
 
 First, ensure you have TypeScript installed:
 
@@ -50,16 +51,18 @@ Then, you can copy the `src/index.ts` file into your project or compile it into 
 
 ### Node Class
 
-The `Node` class represents an individual element within the linked list.
+The `Node` class represents an individual element within the linked list. It now includes `next` and `prev` pointers.
 
 ```typescript
 class Node<T> {
   value: T;
   next: Node<T> | null;
+  prev: Node<T> | null; // Added for Doubly Linked List
 
-  constructor(value: T, next: Node<T> | null = null) {
+  constructor(value: T, next: Node<T> | null = null, prev: Node<T> | null = null) {
     this.value = value;
     this.next = next;
+    this.prev = prev;
   }
 }
 ```
@@ -70,7 +73,7 @@ The `LinkedList` class manages the collection of `Node`s and provides methods to
 
 #### Constructor
 
-Initializes an empty linked list.
+Initializes an empty doubly linked list.
 
 ```typescript
 const myList = new LinkedList<number>();
@@ -84,7 +87,7 @@ Adds a new node with the given `value` to the end of the list.
 ```typescript
 myList.add(10);
 myList.add(20);
-// List: 10 -> 20
+// List: 10 <-> 20
 ```
 
 #### `insertAt(value: T, index: number)` - Insert at Index
@@ -93,7 +96,7 @@ Inserts a new node with the given `value` at a specified `index`. Returns `true`
 
 ```typescript
 myList.insertAt(15, 1);
-// List: 10 -> 15 -> 20
+// List: 10 <-> 15 <-> 20
 ```
 
 #### `remove(value: T)` - Remove First Occurrence of Value
@@ -102,7 +105,7 @@ Removes the first node found with the given `value` from the list. Returns `true
 
 ```typescript
 myList.remove(15);
-// List: 10 -> 20
+// List: 10 <-> 20
 ```
 
 #### `removeAt(index: number)` - Remove at Index
@@ -134,7 +137,7 @@ const value = myList.get(0);
 
 #### `traverse(callback: (value: T) => void)` - Traverse List
 
-Iterates through the list, calling the provided `callback` function for each node's value.
+Iterates through the list, calling the provided `callback` function for each node's value (forward traversal).
 
 ```typescript
 myList.traverse(item => console.log(`Item: ${item}`));
@@ -144,7 +147,7 @@ myList.traverse(item => console.log(`Item: ${item}`));
 
 #### `toArray(): T[]` - Convert to Array
 
-Converts the linked list into a standard TypeScript array.
+Converts the doubly linked list into a standard TypeScript array.
 
 ```typescript
 const listAsArray = myList.toArray();
@@ -170,32 +173,32 @@ console.log(myList.isEmpty()); // true
 
 ## Example
 
-The `src/index.ts` file includes a complete example demonstrating the usage of the `LinkedList` with both `number` and `string` types, showcasing various operations.
+The `src/index.ts` file includes a complete example demonstrating the usage of the `LinkedList` with both `number` and `string` types, showcasing various operations for a doubly linked list.
 
 ```typescript
 // Example Usage (from src/index.ts):
-console.log('--- Integer Linked List ---');
+console.log('--- Integer Doubly Linked List ---');
 const numberList = new LinkedList<number>();
 numberList.add(10);
 numberList.add(20);
 numberList.add(30);
 numberList.insertAt(15, 1); // List: 10, 15, 20, 30
-console.log('List after additions and insertion:', numberList.toArray());
-console.log('Size:', numberList.size);
+console.log('List after additions and insertion:', numberList.toArray()); // [10, 15, 20, 30]
+console.log('Size:', numberList.size); // 4
 
 numberList.remove(20); // List: 10, 15, 30
-console.log('List after removing 20:', numberList.toArray());
-console.log('Size:', numberList.size);
+console.log('List after removing 20:', numberList.toArray()); // [10, 15, 30]
+console.log('Size:', numberList.size); // 3
 
-console.log('Value at index 1:', numberList.get(1));
-console.log('Found 10:', numberList.find(10)?.value);
-console.log('Found 99:', numberList.find(99));
+console.log('Value at index 1:', numberList.get(1)); // 15
+console.log('Found 10:', numberList.find(10)?.value); // 10
+console.log('Found 99:', numberList.find(99)); // null
 
 numberList.removeAt(0); // List: 15, 30
-console.log('List after removing at index 0:', numberList.toArray());
-console.log('Size:', numberList.size);
+console.log('List after removing at index 0:', numberList.toArray()); // [15, 30]
+console.log('Size:', numberList.size); // 2
 
-console.log('\n--- String Linked List ---');
+console.log('\n--- String Doubly Linked List ---');
 const stringList = new LinkedList<string>();
 stringList.add('Apple');
 stringList.add('Banana');
@@ -203,12 +206,12 @@ stringList.add('Cherry');
 console.log('String List:', stringList.toArray());
 stringList.traverse(fruit => console.log(`Fruit: ${fruit}`));
 stringList.clear();
-console.log('String List after clear:', stringList.toArray());
+console.log('String List after clear:', stringList.toArray()); // []
 ```
 
 ## Contributing
 
-Contributions are welcome! If you have suggestions for improvements, bug fixes, or new features (e.g., implementing a Doubly Linked List, adding more utility methods), please open an issue or submit a pull request.
+Contributions are welcome! If you have suggestions for improvements, bug fixes, or new features, please open an issue or submit a pull request.
 
 ## License
 
